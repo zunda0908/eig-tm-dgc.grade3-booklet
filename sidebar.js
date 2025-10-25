@@ -83,6 +83,12 @@ function hideAllSubSidebars(excludeSide = null){
 // side: 'left' or 'right'
 // forceOpen: 切替ボタン押下など例外時に強制的に開く場合
 function handleSidebarClick(action, side, forceOpen=false){
+  // sidebarConfig に設定がないボタンは何もしない
+  if(!sidebarConfig[action]){
+    hideAllSubSidebars(); // 開いてるサブを閉じる
+    return;
+  }
+
   let connector, subSidebar;
   if(side === 'left'){ connector = connectorLeft; subSidebar = subSidebarLeft; }
   else { connector = connectorRight; subSidebar = subSidebarRight; }
@@ -105,6 +111,8 @@ function handleSidebarClick(action, side, forceOpen=false){
   lastOpenedSide = side;
 
   const btn = document.querySelector(`#sidebar${side==='left'?'Left':'Right'} .sidebarItem[data-action="${action}"]`);
+  if(!btn) return; // 念のため null チェック
+
   connector.style.top = btn.offsetTop + 'px';
   connector.style.height = btn.offsetHeight + 'px';
   connector.style.display = 'block';
