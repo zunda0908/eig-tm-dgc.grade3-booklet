@@ -19,6 +19,7 @@ const scaleStep = 0.25; // 25%
 function loadPage(pageNum){
   pageImage.src = `pages/${pageNum}.png?v=${Date.now()}`;
   resetTransform();
+  updateURL();
 }
 
 function resetTransform(){
@@ -28,8 +29,11 @@ function resetTransform(){
   applyTransform();
 }
 
-// 初期表示
-loadPage(currentPage);
+// -------------------- 変形適用 --------------------
+function applyTransform(){
+  pageImage.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+  pageImage.style.transformOrigin = "center top";
+}
 
 // -------------------- ページ切替 --------------------
 pageRightBtn.addEventListener("click", ()=>{
@@ -44,12 +48,6 @@ pageLeftBtn.addEventListener("click", ()=>{
     loadPage(currentPage);
   }
 });
-
-// -------------------- 変形適用 --------------------
-function applyTransform(){
-  pageImage.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-  pageImage.style.transformOrigin = "center top";
-}
 
 // -------------------- マウスドラッグ --------------------
 pageContainer.addEventListener("mousedown",(e)=>{
@@ -83,7 +81,7 @@ pageContainer.addEventListener("touchmove",(e)=>{
   offsetX = e.touches[0].pageX - startX;
   offsetY = e.touches[0].pageY - startY;
   applyTransform();
-  e.preventDefault(); // Chromeスワイプ戻る防止
+  e.preventDefault();
 }, {passive: false});
 
 pageContainer.addEventListener("touchend",(e)=>{
@@ -144,9 +142,37 @@ function resizeContainer(){
 window.addEventListener('resize', resizeContainer);
 window.addEventListener('load', resizeContainer);
 
+// -------------------- URL パラメータ管理 --------------------
+function updateURL(){
+  const params = new URLSearchParams(window.location.search);
+  if(currentPage) params.set('page', currentPage);
+  if(window.currentId) params.set('id', window.currentId);
+  // textは undefined の場合は削除
+  if(params.get('text') === 'undefined'){
+    params.delete('text');
+  }
+  const newUrl = `${window.location.pathname}?${params.toString()}`;
+  window.history.replaceState({}, '', newUrl);
+}
+
 // -------------------- 外部からページ指定用 --------------------
 function setCurrentPage(pageNum){
   if(pageNum < 1 || pageNum > maxPage) return;
   currentPage = pageNum;
-  loadPage(currentPage); // ←即反映
+  loadPage(currentPage);
 }
+
+// -------------------- URL 読み込み時に初期設定 --------------------
+window.addEventListener('load', ()=>{
+  const params = new URLSearchParams(window.location.search);
+  window.currentId = params.get('id') || 'grade3';
+  const pageParam = parseInt(params.get('page'), 10);
+  if(!isNaN(pageParam)) setCurrentPage(pageParam);
+  else setCurrentPage(1);
+  // text=undefined 削除
+  if(params.get('text') === 'undefined'){
+    params.delete('text');
+    const cleanUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, '', cleanUrl);
+  }
+});
