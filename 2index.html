@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NEW HORIZON English Course3（橋＋サブサイドバー対応）</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<style>
+/* -------------------- 全体リセット -------------------- */
+html, body {
+  margin: 0; padding: 0; width: 100vw; height: 100vh;
+  background: #fff;
+  overflow: hidden;
+  font-family: "メイリオ", meiryo, sans-serif;
+}
+
+/* -------------------- 親コンテナ（リサイズ用） -------------------- */
+#parentContainer {
+  position: absolute;
+  width: 1920px;
+  height: 1080px;
+  left: 50%;
+  top: 50%;
+  transform-origin: 50% 50%;
+  background: #fff;
+}
+
+/* -------------------- 左右メインサイドバー -------------------- */
+.sidebar {
+  position: absolute;
+  top: 0;
+  width: 97.4px;
+  height: 100%;
+  background: #cacaca;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 13px;
+  z-index: 100;
+}
+
+.sidebar button {
+  width: 71px;
+  height: 71px;
+  margin-bottom: 13px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.15));
+  position: relative;
+}
+.sidebar button img { width: 100%; height: 100%; display: block; }
+
+#sidebarLeft { left: 0; }
+#sidebarRight { right: 0; display: none; } /* 初期は右非表示 */
+
+/* -------------------- 橋（connector） -------------------- */
+.connector {
+  position: absolute;
+  width: 30px;
+  background: #cacaca;
+  display: none; /* 初期非表示 */
+  z-index: 50;
+  border-radius: 0;
+}
+
+/* -------------------- サブサイドバー -------------------- */
+.sub-sidebar {
+  position: absolute;
+  width: 80px;
+  background: #cacaca;
+  display: none;
+  z-index: 100;
+  overflow: hidden;
+  border-radius: 13px;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 6px;
+}
+.sub-sidebar img {
+  width: 70px;
+  height: auto;
+  margin-bottom: 8px;
+  cursor: pointer; /* サブもクリック可能 */
+}
+
+/* -------------------- ページエリア -------------------- */
+#pageContainer {
+  position: absolute;
+  left: 194.8px;
+  top: 0;
+  width: 1534.9px;
+  height: 1040.1px;
+  overflow: hidden;
+  background: #fff;
+  user-select: none;
+}
+#pageImage {
+  position: absolute;
+  left: 0; top: 0;
+  width: 1534.9px; height: 1040.1px;
+  cursor: grab;
+  transition: transform 0.1s ease-out;
+}
+
+/* ページ切替ボタン */
+#pageLeftBtn, #pageRightBtn {
+  position: absolute;
+  width: 70.3px;
+  height: 39.9px;
+  cursor: pointer;
+  z-index: 5000;
+}
+#pageLeftBtn { left: 194.8px; top: 1040.1px; }
+#pageRightBtn { left: 1655.9px; top: 1040.1px; }
+
+/* -------------------- サイドバー切替スイッチ -------------------- */
+#toggleLeftSwitch, #toggleRightSwitch {
+  position: absolute;
+  width: 30.8px;
+  height: 86.4px;
+  top: 496.8px;
+  cursor: pointer;
+  z-index: 1100;
+}
+#toggleLeftSwitch { left: 0; display: none; }
+#toggleRightSwitch { left: 1886.2px; }
+#toggleLeftSwitch img, #toggleRightSwitch img {
+  width: 100%; height: 100%; object-fit: contain;
+}
+</style>
+</head>
+<body>
+<div id="parentContainer">
+
+  <!-- 左メインサイドバー -->
+  <div id="sidebarLeft" class="sidebar">
+    <button class="sidebarItem" data-action="hyoji"><img src="hyoji.svg" alt="表示"></button>
+    <button class="sidebarItem" data-action="video"><img src="video.svg" alt="動画"></button>
+    <button class="sidebarItem" data-action="pc"><img src="pc.svg" alt="PC"></button>
+    <button class="sidebarItem" data-action="fc"><img src="fc.svg" alt="フラッシュカード"></button>
+    <button class="sidebarItem" data-action="ss"><img src="ss.svg" alt="スクショ"></button>
+    <button class="sidebarItem" data-action="timer"><img src="timer.svg" alt="タイマー"></button>
+    <button class="sidebarItem" data-action="originalPc"><img src="original-pc.svg" alt="オリジナルPC"></button>
+    <button class="sidebarItem" data-action="shoChu"><img src="sho-chu.svg" alt="小中"></button>
+    <button class="sidebarItem" data-action="worksheet"><img src="worksheet.svg" alt="ワークシート"></button>
+    <button class="sidebarItem" data-action="dictionary"><img src="dictionary.svg" alt="辞書"></button>
+    <button class="sidebarItem" data-action="dgcMap"><img src="dgc-map.svg" alt="デジタルマップ"></button>
+    <button class="sidebarItem" data-action="mokuji"><img src="mokuji.svg" alt="目次"></button>
+  </div>
+
+  <!-- 左橋＋サブサイドバー -->
+  <div id="connectorLeft" class="connector" style="left:97.4px;"></div>
+  <div id="subSidebarLeft" class="sub-sidebar" style="left:107.4px;"></div>
+
+  <!-- 右メインサイドバー -->
+  <div id="sidebarRight" class="sidebar">
+    <button class="sidebarItem" data-action="hyoji"><img src="hyoji.svg" alt="表示"></button>
+    <button class="sidebarItem" data-action="video"><img src="video.svg" alt="動画"></button>
+    <button class="sidebarItem" data-action="pc"><img src="pc.svg" alt="PC"></button>
+    <button class="sidebarItem" data-action="fc"><img src="fc.svg" alt="フラッシュカード"></button>
+    <button class="sidebarItem" data-action="ss"><img src="ss.svg" alt="スクショ"></button>
+    <button class="sidebarItem" data-action="timer"><img src="timer.svg" alt="タイマー"></button>
+    <button class="sidebarItem" data-action="originalPc"><img src="original-pc.svg" alt="オリジナルPC"></button>
+    <button class="sidebarItem" data-action="shoChu"><img src="sho-chu.svg" alt="小中"></button>
+    <button class="sidebarItem" data-action="worksheet"><img src="worksheet.svg" alt="ワークシート"></button>
+    <button class="sidebarItem" data-action="dictionary"><img src="dictionary.svg" alt="辞書"></button>
+    <button class="sidebarItem" data-action="dgcMap"><img src="dgc-map.svg" alt="デジタルマップ"></button>
+    <button class="sidebarItem" data-action="mokuji"><img src="mokuji.svg" alt="目次"></button>
+  </div>
+
+  <!-- 右橋＋サブサイドバー -->
+  <div id="connectorRight" class="connector" style="right:97.4px;"></div>
+  <div id="subSidebarRight" class="sub-sidebar" style="right:107.4px;"></div>
+
+  <!-- サイドバー切替スイッチ -->
+  <img id="toggleLeftSwitch" src="sidebar-left.svg" alt="左切替スイッチ">
+  <img id="toggleRightSwitch" src="sidebar-right.svg" alt="右切替スイッチ">
+
+  <!-- ページ表示 -->
+  <div id="pageContainer">
+    <img id="pageImage" src="pages/1.png" alt="紙面画像" draggable="false" />
+  </div>
+  <img id="pageLeftBtn" src="page-left.svg" alt="前ページ">
+  <img id="pageRightBtn" src="page-right.svg" alt="次ページ">
+
+</div>
+
+<script src="sidebar.js"></script>
+<script src="booklet.js"></script>
+<script src="query.js"></script>
+</body>
+</html>

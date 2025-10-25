@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2段サイドバー構成テスト（リサイズ＋サブSVGボタン）</title>
+<style>
+  /* -------------------- 全体リセット -------------------- */
+  html, body {
+    margin: 0; padding: 0;
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  /* -------------------- 親コンテナ（リサイズ用） -------------------- */
+  #parentContainer {
+    position: absolute;
+    width: 1920px; height: 1080px;
+    left: 50%; top: 50%;
+    transform-origin: 50% 50%;
+    background: transparent;
+  }
+
+  /* -------------------- 左サイドバー -------------------- */
+  .sidebar {
+    position: absolute;
+    top: 0; left: 0;
+    width: 97.4px; height: 100%;
+    background: #cacaca;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 13px;
+    z-index: 100;
+  }
+
+  /* サイドバーボタン */
+  .sidebar button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin-bottom: 13px;
+  }
+  .sidebar img {
+    width: 70px;
+    height: 70px;
+    display: block;
+  }
+
+  /* -------------------- サイドバーから伸びる“橋” -------------------- */
+  .connector {
+    position: absolute;
+    width: 30px;
+    background: #cacaca;
+    display: none; /* 初期非表示 */
+    z-index: 50;
+  }
+
+  /* -------------------- サブサイドバー -------------------- */
+  .sub-sidebar {
+    position: absolute;
+    left: 107.4px; /* 橋の横幅30px加算 */
+    width: 80px;
+    background: #cacaca;
+    display: none;
+    z-index: 100;
+    overflow: hidden;
+    border-radius: 13px;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 6px;
+  }
+
+  /* サブサイドバー内ボタン */
+  .sub-sidebar button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin-bottom: 8px;
+    width: 70px;
+  }
+  .sub-sidebar img {
+    width: 70px;
+    height: auto;
+    display: block;
+  }
+
+  /* 表示時クラス */
+  .visible {
+    display: flex !important;
+  }
+</style>
+</head>
+<body>
+<div id="parentContainer">
+  <!-- -------------------- 左サイドバー -------------------- -->
+  <div class="sidebar">
+    <button class="sidebarItem" data-action="hyoji"><img src="hyoji.svg" alt="表示"></button>
+    <button class="sidebarItem" data-action="video"><img src="video.svg" alt="動画"></button>
+    <button class="sidebarItem" data-action="pc"><img src="pc.svg" alt="PC"></button>
+    <button class="sidebarItem" data-action="fc"><img src="fc.svg" alt="フラッシュカード"></button>
+    <button class="sidebarItem" data-action="ss"><img src="ss.svg" alt="スクショ"></button>
+    <button class="sidebarItem" data-action="timer"><img src="timer.svg" alt="タイマー"></button>
+    <button class="sidebarItem" data-action="originalPc"><img src="original-pc.svg" alt="オリジナルPC"></button>
+    <button class="sidebarItem" data-action="shoChu"><img src="sho-chu.svg" alt="小中"></button>
+    <button class="sidebarItem" data-action="worksheet"><img src="worksheet.svg" alt="ワークシート"></button>
+    <button class="sidebarItem" data-action="dictionary"><img src="dictionary.svg" alt="辞書"></button>
+    <button class="sidebarItem" data-action="dgcMap"><img src="dgc-map.svg" alt="デジタルマップ"></button>
+    <button class="sidebarItem" data-action="mokuji"><img src="mokuji.svg" alt="目次"></button>
+  </div>
+
+  <!-- -------------------- 橋 -------------------- -->
+  <div id="connector" class="connector"></div>
+
+  <!-- -------------------- サブサイドバー -------------------- -->
+  <div id="subSidebar" class="sub-sidebar"></div>
+</div>
+
+<script>
+  const sidebarItems = document.querySelectorAll('.sidebarItem');
+  const connector = document.getElementById('connector');
+  const subSidebar = document.getElementById('subSidebar');
+  const parentContainer = document.getElementById('parentContainer');
+
+  // -------------------- サイドバーボタンごとのサブSVG設定 --------------------
+  const sidebarConfig = {
+    video: { images: ['key-sentence.svg','preview.svg','siryo.svg'] },
+    timer: { images: ['ti-timer.svg','it-stop-watch.svg','ti-wpm.svg'] },
+    shoChu: { images: ['rhythm-box.svg','alphabet-chart.svg','song.svg'] },
+    worksheet: { images: ['grammer.svg','word-room.svg'] },
+    hyoji: { images: ['kakudai.svg','shukusho.svg','booklet.svg'] }
+  };
+
+  let activeButton = null; // 現在表示中のボタン
+
+  // -------------------- サイドバークリックイベント --------------------
+  sidebarItems.forEach((btn, index) => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+
+      if(sidebarConfig[action]){
+        if(activeButton === action){
+          // 同じボタンを押したら非表示
+          connector.classList.remove('visible');
+          subSidebar.classList.remove('visible');
+          subSidebar.innerHTML = '';
+          activeButton = null;
+        } else {
+          // まず既存のサブサイドバーを非表示に
+          connector.classList.remove('visible');
+          subSidebar.classList.remove('visible');
+          subSidebar.innerHTML = '';
+
+          // -------------------- 橋表示 --------------------
+          const btnHeight = btn.offsetHeight;
+          const btnTop = btn.offsetTop;
+          connector.style.top = btnTop + 'px';
+          connector.style.height = btnHeight + 'px';
+          connector.classList.add('visible');
+
+          // -------------------- サブサイドバー中身作成 --------------------
+          sidebarConfig[action].images.forEach(src => {
+            const subBtn = document.createElement('button');
+            const img = document.createElement('img');
+            img.src = src;
+            subBtn.appendChild(img);
+
+            // サブSVGボタンもクリック可能（ここでアクション追加可能）
+            subBtn.addEventListener('click', () => alert(src));
+
+            subSidebar.appendChild(subBtn);
+          });
+
+          // -------------------- サブサイドバー位置 --------------------
+          subSidebar.style.top = btnTop + 'px';
+          subSidebar.classList.add('visible');
+
+          activeButton = action;
+        }
+      }
+    });
+  });
+
+  // -------------------- リサイズ対応 --------------------
+  function resizeContainer() {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const baseWidth = 1920;
+    const baseHeight = 1080;
+    const aspectRatio = baseWidth / baseHeight;
+
+    let scale;
+    if (vw / vh > aspectRatio) {
+      scale = vh / baseHeight;
+    } else {
+      scale = vw / baseWidth;
+    }
+
+    parentContainer.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+
+  window.addEventListener('resize', resizeContainer);
+  window.addEventListener('load', resizeContainer);
+</script>
+</body>
+</html>
